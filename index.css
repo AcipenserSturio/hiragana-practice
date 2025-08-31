@@ -1,0 +1,17 @@
+body {
+    font-family: sans-serif;
+    padding: 2rem;
+}
+.quiz {
+    margin-top: 2rem;
+}
+.jp {
+    font-size: 2rem;
+    font-weight: bold;
+}
+.correct {
+    color: green;
+}
+.wrong {
+    color: red;
+}
