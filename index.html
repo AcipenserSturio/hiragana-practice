@@ -2,18 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Hiragana Practice</title>
+  <title>Hiragana Quiz</title>
   <style>
-    body { font-family: sans-serif; padding: 1rem; }
-    table { border-collapse: collapse; margin-top: 1rem; width: 100%; }
-    th, td { border: 1px solid #ddd; padding: 0.5rem; }
-    th { background: #f4f4f4; }
+    body { font-family: sans-serif; padding: 2rem; }
+    .quiz { margin-top: 2rem; }
+    .jp { font-size: 2rem; font-weight: bold; }
+    .correct { color: green; }
+    .wrong { color: red; }
   </style>
 </head>
 <body>
-  <h1>Hiragana Dictionary Filter</h1>
-  <p>Showing only words written in Hiragana.</p>
-  <table id="results"></table>
+  <h1>Hiragana → Romaji Quiz</h1>
+  <p>Type the romaji (Latin characters) for the given hiragana.</p>
+
+  <div class="quiz">
+    <div>Hiragana: <span id="hiragana" class="jp"></span></div>
+    <div>English: <span id="english"></span></div>
+    <input id="answer" placeholder="Type romaji..." autocomplete="off"/>
+    <div id="feedback"></div>
+    <div id="results"></div>
+  </div>
 
   <script>
     // ✅ Check if string is hiragana (with "kanji【hiragana】" support)
@@ -29,6 +37,97 @@
       );
     }
 
+    // --- 1. Simple romaji mapping ---
+    const ROMAJI_MAP = {
+      "あ":"a","い":"i","う":"u","え":"e","お":"o",
+      "か":"ka","き":"ki","く":"ku","け":"ke","こ":"ko",
+      "さ":"sa","し":"shi","す":"su","せ":"se","そ":"so",
+      "た":"ta","ち":"chi","つ":"tsu","て":"te","と":"to",
+      "な":"na","に":"ni","ぬ":"nu","ね":"ne","の":"no",
+      "は":"ha","ひ":"hi","ふ":"fu","へ":"he","ほ":"ho",
+      "ま":"ma","み":"mi","む":"mu","め":"me","も":"mo",
+      "や":"ya","ゆ":"yu","よ":"yo",
+      "ら":"ra","り":"ri","る":"ru","れ":"re","ろ":"ro",
+      "わ":"wa","を":"wo","ん":"n",
+      "が":"ga","ぎ":"gi","ぐ":"gu","げ":"ge","ご":"go",
+      "ざ":"za","じ":"ji","ず":"zu","ぜ":"ze","ぞ":"zo",
+      "だ":"da","ぢ":"ji","づ":"zu","で":"de","ど":"do",
+      "ば":"ba","び":"bi","ぶ":"bu","べ":"be","ぼ":"bo",
+      "ぱ":"pa","ぴ":"pi","ぷ":"pu","ぺ":"pe","ぽ":"po",
+      "きゃ":"kya","きゅ":"kyu","きょ":"kyo",
+      "しゃ":"sha","しゅ":"shu","しょ":"sho",
+      "ちゃ":"cha","ちゅ":"chu","ちょ":"cho",
+      "にゃ":"nya","にゅ":"nyu","にょ":"nyo",
+      "ひゃ":"hya","ひゅ":"hyu","ひょ":"hyo",
+      "みゃ":"mya","みゅ":"myu","みょ":"myo",
+      "りゃ":"rya","りゅ":"ryu","りょ":"ryo",
+      "ぎゃ":"gya","ぎゅ":"gyu","ぎょ":"gyo",
+      "じゃ":"ja","じゅ":"ju","じょ":"jo",
+      "びゃ":"bya","びゅ":"byu","びょ":"byo",
+      "ぴゃ":"pya","ぴゅ":"pyu","ぴょ":"pyo"
+    };
+
+    // --- 2. Extract hiragana from "kanji【hiragana】" ---
+    function extractHiragana(str) {
+      const match = str.match(/(?<=【)(.*?)(?=】)/);
+      return match ? match[0] : str;
+    }
+
+    // --- 3. Hiragana → Romaji transliteration ---
+    function toRomaji(hiragana) {
+      let result = "";
+      for (let i = 0; i < hiragana.length; i++) {
+        // Try digraph (e.g. きゃ, しゃ, ちゃ…)
+        const twoChar = hiragana.slice(i, i+2);
+        if (ROMAJI_MAP[twoChar]) {
+          result += ROMAJI_MAP[twoChar];
+          i++;
+          continue;
+        }
+        // Fallback single char
+        result += ROMAJI_MAP[hiragana[i]] || hiragana[i];
+      }
+      return result;
+    }
+
+    // --- 4. Example data (normally fetched from TSV) ---
+    // const filtered = [
+    //   { id: "1", jp: "ねこ", en: "cat" },
+    //   { id: "2", jp: "いぬ", en: "dog" },
+    //   { id: "3", jp: "勉強【べんきょう】", en: "study" }
+    // ];
+
+    // --- 5. Quiz logic ---
+    let filtered = null;
+    let current = null;
+    const hiraganaSpan = document.getElementById("hiragana");
+    const englishSpan = document.getElementById("english");
+    const answerInput = document.getElementById("answer");
+    const feedback = document.getElementById("feedback");
+
+    function newWord() {
+      current = filtered[Math.floor(Math.random() * filtered.length)];
+      const hira = extractHiragana(current.jp);
+      current.hira = hira;
+      current.romaji = toRomaji(hira);
+      console.log(current);
+      hiraganaSpan.textContent = current.jp;
+      englishSpan.textContent = current.en;
+      answerInput.value = "";
+      feedback.textContent = "";
+    }
+
+    answerInput.addEventListener("input", () => {
+      if (!current) return;
+      if (answerInput.value.trim().toLowerCase() === current.romaji) {
+        feedback.textContent = "✓ Correct!";
+        feedback.className = "correct";
+        setTimeout(newWord, 800); // load next word
+      } else {
+        feedback.textContent = "";
+      }
+    });
+
     // ✅ Fetch TSV from a permanent URL
     const DATA_URL = "https://raw.githubusercontent.com/AcipenserSturio/hiragana-practice/refs/heads/main/dict.tsv"; // <-- replace with real URL
 
@@ -42,45 +141,23 @@
         const jpIndex = header.indexOf("jp");
         const enIndex = header.indexOf("en");
 
-        const filtered = dataRows
+        filtered = dataRows
           .map(row => ({
             id: row[idIndex],
             jp: row[jpIndex],
             en: row[enIndex]
           }))
           .filter(entry => isHiragana(entry.jp));
+        console.log(filtered);
+        newWord();
 
-        renderTable(header, filtered);
+        // renderTable(header, filtered);
       })
       .catch(err => {
         document.getElementById("results").textContent =
           "Error loading data: " + err;
       });
 
-    // ✅ Render as HTML table
-    function renderTable(header, rows) {
-      const table = document.getElementById("results");
-
-      // Header row
-      const thead = document.createElement("tr");
-      ["id", "jp", "en"].forEach(col => {
-        const th = document.createElement("th");
-        th.textContent = col;
-        thead.appendChild(th);
-      });
-      table.appendChild(thead);
-
-      // Data rows
-      rows.forEach(row => {
-        const tr = document.createElement("tr");
-        ["id", "jp", "en"].forEach(col => {
-          const td = document.createElement("td");
-          td.textContent = row[col];
-          tr.appendChild(td);
-        });
-        table.appendChild(tr);
-      });
-    }
   </script>
 </body>
 </html>
