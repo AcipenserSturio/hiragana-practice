@@ -144,3 +144,5 @@ fetch(DATA_URL)
     document.getElementById("results").textContent =
       "Error loading data: " + err;
   });
+
+document.getElementById("answer").focus();

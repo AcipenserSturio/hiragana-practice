@@ -4,20 +4,24 @@
         <meta charset="UTF-8" />
         <title>Hiragana Quiz</title>
         <link rel="stylesheet" href="index.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&amp;display=swap"
+            rel="stylesheet"
+        />
     </head>
     <body>
         <h1>Hiragana → Romaji Quiz</h1>
         <p>Type the romaji (Latin characters) for the given hiragana.</p>
         <div class="quiz">
-            <div>Hiragana: <span id="hiragana" class="jp"></span></div>
-            <div>English: <span id="english"></span></div>
+            <h2><!--Hiragana: --><span id="hiragana" class="jp"></span></h2>
+            <p><!--English: --><span id="english"></span></p>
             <input
                 id="answer"
                 placeholder="Type romaji..."
                 autocomplete="off"
             />
-            <div id="feedback"></div>
-            <div id="results"></div>
+            <p id="feedback"></p>
+            <p id="results"></p>
         </div>
 
         <script src="index.js"></script>
