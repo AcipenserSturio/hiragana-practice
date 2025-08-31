@@ -33,7 +33,7 @@
         }
       }
       return Array.from(str).every(
-        (ch) => ch >= "ぁ" && ch <= "ゟ"
+        (ch) => (ch >= "ぁ" && ch <= "ゟ") || ("ー（）、".includes(ch))
       );
     }
 
@@ -64,7 +64,8 @@
       "ぎゃ":"gya","ぎゅ":"gyu","ぎょ":"gyo",
       "じゃ":"ja","じゅ":"ju","じょ":"jo",
       "びゃ":"bya","びゅ":"byu","びょ":"byo",
-      "ぴゃ":"pya","ぴゅ":"pyu","ぴょ":"pyo"
+      "ぴゃ":"pya","ぴゅ":"pyu","ぴょ":"pyo",
+      "（": " (", "）": ")", "、": ", ",
     };
 
     // --- 2. Extract hiragana from "kanji【hiragana】" ---
@@ -87,7 +88,18 @@
         // Fallback single char
         result += ROMAJI_MAP[hiragana[i]] || hiragana[i];
       }
-      return result;
+
+      // Handle sokuon (っ)
+      // Replace "っ<romaji>" by duplicating the first consonant of the romaji syllable
+      // cch is incorrect in Hepburn, but common anyway, so who cares really
+      result = result.replace(/っ([a-z])/g, (_, c) => c + c);
+
+      // Handle long vowel mark (ー)
+      // Duplicate the preceding vowel
+      // This is Hepburn-noncompliant, but normal people don't have long vowels on their keyboard anyway. This is fine for a training app
+      result = result.replace(/([aeiou])ー/g, (_, v) => v + v);
+
+      return result.trim();
     }
 
     // --- 4. Example data (normally fetched from TSV) ---
