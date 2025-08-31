@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hiragana Practice</title>
+  <style>
+    body { font-family: sans-serif; padding: 1rem; }
+    table { border-collapse: collapse; margin-top: 1rem; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; }
+    th { background: #f4f4f4; }
+  </style>
+</head>
+<body>
+  <h1>Hiragana Dictionary Filter</h1>
+  <p>Showing only words written in Hiragana.</p>
+  <table id="results"></table>
+
+  <script>
+    // ✅ Check if string is hiragana (with "kanji【hiragana】" support)
+    function isHiragana(str) {
+      if (str.includes("【")) {
+        const match = str.match(/(?<=【)(.*?)(?=】)/);
+        if (match) {
+          return isHiragana(match[0]);
+        }
+      }
+      return Array.from(str).every(
+        (ch) => ch >= "ぁ" && ch <= "ゟ"
+      );
+    }
+
+    // ✅ Fetch TSV from a permanent URL
+    const DATA_URL = "https://raw.githubusercontent.com/AcipenserSturio/hiragana-practice/refs/heads/main/dict.tsv"; // <-- replace with real URL
+
+    fetch(DATA_URL)
+      .then(resp => resp.text())
+      .then(text => {
+        const rows = text.trim().split("\n").map(line => line.split("\t"));
+        const [header, ...dataRows] = rows;
+
+        const idIndex = header.indexOf("id");
+        const jpIndex = header.indexOf("jp");
+        const enIndex = header.indexOf("en");
+
+        const filtered = dataRows
+          .map(row => ({
+            id: row[idIndex],
+            jp: row[jpIndex],
+            en: row[enIndex]
+          }))
+          .filter(entry => isHiragana(entry.jp));
+
+        renderTable(header, filtered);
+      })
+      .catch(err => {
+        document.getElementById("results").textContent =
+          "Error loading data: " + err;
+      });
+
+    // ✅ Render as HTML table
+    function renderTable(header, rows) {
+      const table = document.getElementById("results");
+
+      // Header row
+      const thead = document.createElement("tr");
+      ["id", "jp", "en"].forEach(col => {
+        const th = document.createElement("th");
+        th.textContent = col;
+        thead.appendChild(th);
+      });
+      table.appendChild(thead);
+
+      // Data rows
+      rows.forEach(row => {
+        const tr = document.createElement("tr");
+        ["id", "jp", "en"].forEach(col => {
+          const td = document.createElement("td");
+          td.textContent = row[col];
+          tr.appendChild(td);
+        });
+        table.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
