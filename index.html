@@ -14,7 +14,11 @@
         <p>Type the romaji (Latin characters) for the given hiragana.</p>
         <div class="quiz">
             <h2><!--Hiragana: --><span id="hiragana" class="jp"></span></h2>
-            <p><!--English: --><span id="english"></span></p>
+            <p>
+                <!--English: --><span id="english"
+                    >Loading, please wait...</span
+                >
+            </p>
             <input
                 id="answer"
                 placeholder="Type romaji..."
@@ -22,6 +26,106 @@
             />
             <p id="feedback"></p>
             <p id="results"></p>
+            <details>
+                <summary>Hiragana cheatsheet</summary>
+                <table class="cheatsheet">
+                    <tr>
+                        <th></th>
+                        <th>a</th>
+                        <th>i</th>
+                        <th>u</th>
+                        <th>e</th>
+                        <th>o</th>
+                    </tr>
+                    <tr>
+                        <td><b>∅</b></td>
+                        <td>あ</td>
+                        <td>い</td>
+                        <td>う</td>
+                        <td>え</td>
+                        <td>お</td>
+                    </tr>
+                    <tr>
+                        <td><b>k</b></td>
+                        <td>か</td>
+                        <td>き</td>
+                        <td>く</td>
+                        <td>け</td>
+                        <td>こ</td>
+                    </tr>
+                    <tr>
+                        <td><b>s</b></td>
+                        <td>さ</td>
+                        <td>し</td>
+                        <td>す</td>
+                        <td>せ</td>
+                        <td>そ</td>
+                    </tr>
+                    <tr>
+                        <td><b>t</b></td>
+                        <td>た</td>
+                        <td>ち</td>
+                        <td>つ</td>
+                        <td>て</td>
+                        <td>と</td>
+                    </tr>
+                    <tr>
+                        <td><b>n</b></td>
+                        <td>な</td>
+                        <td>に</td>
+                        <td>ぬ</td>
+                        <td>ね</td>
+                        <td>の</td>
+                    </tr>
+                    <tr>
+                        <td><b>h</b></td>
+                        <td>は</td>
+                        <td>ひ</td>
+                        <td>ふ</td>
+                        <td>へ</td>
+                        <td>ほ</td>
+                    </tr>
+                    <tr>
+                        <td><b>m</b></td>
+                        <td>ま</td>
+                        <td>み</td>
+                        <td>む</td>
+                        <td>め</td>
+                        <td>も</td>
+                    </tr>
+                    <tr>
+                        <td><b>y</b></td>
+                        <td>や</td>
+                        <td></td>
+                        <td>ゆ</td>
+                        <td></td>
+                        <td>よ</td>
+                    </tr>
+                    <tr>
+                        <td><b>r</b></td>
+                        <td>ら</td>
+                        <td>り</td>
+                        <td>る</td>
+                        <td>れ</td>
+                        <td>ろ</td>
+                    </tr>
+                    <tr>
+                        <td><b>w</b></td>
+                        <td>わ</td>
+                        <td>ゐ</td>
+                        <td></td>
+                        <td>ゑ</td>
+                        <td>を</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">ん <b>(n)</b></td>
+                    </tr>
+                </table>
+            </details>
+            <details>
+                <summary>Dictionary</summary>
+                <table id="dictionary"></table>
+            </details>
         </div>
 
         <script src="index.js"></script>

@@ -1,4 +1,4 @@
-// ✅ Check if string is hiragana (with "kanji【hiragana】" support)
+// Check if string is hiragana (with "kanji【hiragana】" support)
 function isHiragana(str) {
   if (str.includes("【")) {
     const match = str.match(/(?<=【)(.*?)(?=】)/);
@@ -9,6 +9,31 @@ function isHiragana(str) {
   return Array.from(str).every(
     (ch) => (ch >= "ぁ" && ch <= "ゟ") || "ー（）、".includes(ch),
   );
+}
+
+// Render as HTML table
+function renderTable(header, rows) {
+  const table = document.getElementById("dictionary");
+
+  // Header row
+  const thead = document.createElement("tr");
+  ["id", "jp", "en"].forEach((col) => {
+    const th = document.createElement("th");
+    th.textContent = col;
+    thead.appendChild(th);
+  });
+  table.appendChild(thead);
+
+  // Data rows
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    ["id", "jp", "en"].forEach((col) => {
+      const td = document.createElement("td");
+      td.textContent = row[col];
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
 }
 
 // --- 1. Simple romaji mapping ---
@@ -43,8 +68,9 @@ const ROMAJI_MAP = JSON.parse(`{
   "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo",
 
   "ん": "n",
-
-  "（": " (", "）": ")", "、": ", "
+  "（": " (",
+  "）": ")",
+  "、": ", "
 }`);
 
 // --- 2. Extract hiragana from "kanji【hiragana】" ---
@@ -70,8 +96,9 @@ function toRomaji(hiragana) {
 
   // Handle sokuon (っ)
   // Replace "っ<romaji>" by duplicating the first consonant of the romaji syllable
-  // cch is incorrect in Hepburn, but common anyway, so who cares really
   result = result.replace(/っ([a-z])/g, (_, c) => c + c);
+  // cch -> tch
+  result = result.replace("tch", "cch");
 
   // Handle long vowel mark (ー)
   // Duplicate the preceding vowel
@@ -130,15 +157,14 @@ fetch(DATA_URL)
 
     filtered = dataRows
       .map((row) => ({
-        id: row[idIndex],
         jp: row[jpIndex],
         en: row[enIndex],
       }))
-      .filter((entry) => isHiragana(entry.jp));
+      .filter((entry) => isHiragana(entry.jp))
+      .map((row, index) => ({ ...row, id: index + 1 }));
     console.log(filtered);
     newWord();
-
-    // renderTable(header, filtered);
+    renderTable(header, filtered);
   })
   .catch((err) => {
     document.getElementById("results").textContent =
