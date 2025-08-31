@@ -98,7 +98,7 @@ function toRomaji(hiragana) {
   // Replace "っ<romaji>" by duplicating the first consonant of the romaji syllable
   result = result.replace(/っ([a-z])/g, (_, c) => c + c);
   // cch -> tch
-  result = result.replace("tch", "cch");
+  result = result.replace("cch", "tch");
 
   // Handle long vowel mark (ー)
   // Duplicate the preceding vowel
